@@ -45,6 +45,12 @@ namespace Crayon.Application.Features.Accounts.OrderServiceForAccount
                 .MustAsync(async (accountId, ct) => await _dataContext.Accounts.AnyAsync(a => a.Id == accountId, ct))
                 .WithMessage("Account with Id: {PropertyValue} does not exist.");
 
+            RuleFor(x => x)
+                .MustAsync(async (command, ct) =>
+                    !(await _dataContext.AccountServices.AnyAsync(ac => ac.ServiceId == command.ServiceId && ac.AccountId == command.AccountId, ct)))
+                .WithMessage("Service already assigned to account.");
+
+
             RuleFor(x => x.ServiceId).NotEmpty().GreaterThan(0);
 
             RuleFor(x => x.Quantity).NotEmpty().GreaterThan(0);
